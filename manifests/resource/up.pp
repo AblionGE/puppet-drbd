@@ -37,11 +37,11 @@ define drbd::resource::up (
 
   # these resources should only be applied if we are configuring the
   # primary node in our HA setup
-  if $ha_primary {
+  if $ha_primary == "true" {
     # these things should only be done on the primary during initial setup
     if $initial_setup {
       exec { "drbd_make_primary_${name}":
-        command => "drbdadm -- --overwrite-data-of-peer primary ${name}",
+        command => "drbdadm -- --overwrite-data-of-peer --force primary ${name}",
         unless  => "drbdadm role ${name} | egrep '^Primary'",
         onlyif  => "drbdadm dstate ${name} | egrep '^Inconsistent'",
         notify  => Exec["drbd_format_volume_${name}"],
